@@ -1,10 +1,6 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Grafo<T> {
@@ -46,25 +42,6 @@ public class Grafo<T> {
             System.out.println("\n");
         }
     }
-
-    public boolean alcance(T origem, T destino){
-        visitados = new ArrayList<>();
-        
-        return existeCaminho(origem, destino, visitados);
-    }
-
-    private boolean existeCaminho(T verticeAtual, T destino, ArrayList<T> visitados){
-        if(verticeAtual.equals(destino))
-            return true;
-        visitados.add(verticeAtual);
-        LinkedList<Aresta> adjacencias = meuGrafo.get(verticeAtual);
-        for(Aresta adjacente: adjacencias)
-            if(!visitados.contains(adjacente.vertice))
-                return existeCaminho((T)adjacente.vertice, destino, visitados);
-
-        return false;
-    }
-    
     public ArrayList<T> buscaProfundidadeDFS(T origem){
         visitados = new ArrayList<>();
         explorarDFS(origem, visitados);
@@ -78,5 +55,45 @@ public class Grafo<T> {
             if(!visitados.contains(adjacente.vertice))
                  explorarDFS((T)adjacente.vertice, visitados);
 
+    }
+
+    public boolean alcance(T origem, T destino){
+        visitados = new ArrayList<>();
+        boolean existe = existeCaminho(origem, destino, visitados);
+        System.out.println("*** Percurso de visitados ***");
+        System.out.println(visitados);
+        return existe; 
+    }
+
+    private boolean existeCaminho(T verticeAtual, T destino, ArrayList<T> visitados){
+        if(verticeAtual.equals(destino))
+            return true;
+        visitados.add(verticeAtual);
+        LinkedList<Aresta> adjacencias = meuGrafo.get(verticeAtual);
+        for(Aresta adjacente: adjacencias)
+            if(!visitados.contains(adjacente.vertice))
+                return existeCaminho((T)adjacente.vertice, destino, visitados);
+
+        return false;
+    }
+
+    public List<T> explorarLarguraBFS(T inicio){
+    	Queue<T> fila = new LinkedList<>();
+    	Map<T, T> predecessores = new HashMap<>();
+    	visitados = new ArrayList<>();
+    	fila.add(inicio);
+    	while(!fila.isEmpty()) {
+    		T verticeAtual = fila.poll();
+    		visitados.add(verticeAtual);
+    		LinkedList<Aresta> adjacencias = meuGrafo.get(verticeAtual);
+    		for(Aresta<T> adj : adjacencias) {
+    			if(!visitados.contains(adj) && !fila.contains(adj)) {
+    				fila.add(adj.vertice);
+    				predecessores.put(adj.vertice, verticeAtual);
+    			}	
+    		}
+    	}
+    	System.out.println("Predecessores: " + predecessores);
+    	return visitados;
     }
 }
